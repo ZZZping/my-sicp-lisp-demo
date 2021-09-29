@@ -8,8 +8,15 @@
   (cond ((= count 0) 0)
         ((even? count) (fib-iter a b (+ (square p) (square q)) (* 2 (* p q)) (/ count 2)))
         (else (fib-iter (+ (* b q) (* a (+ p q))) (+ (* b p) (* a q)) p q (- count 1)))))
+(define (fib-0 n)
+  (fib-iter 1 0 1 1 n))
+
+;;another fib
 (define (fib n)
-  (fib-iter 1 0 0 1 n))
+  (cond ((= n 0) 0)
+        ((= n 1) 1)
+        (else (+ (fib (- n 1))
+                 (fib (- n 2))))))
 ;;(define (make-rat n d) (cons n d))
 (define (make-rat n d)
   (let ((g (gcd n d)))
@@ -377,3 +384,19 @@
   (accumulate + 0 (map square (filter odd? (enumrate-tree tree)))))
 ;;test
 ; (sum-odd-squares (list 1 (list 2 (list 3 4) 5) (list 6 7)))
+;;ebumrate the integers from 0 to n, generate the Fibonacci number
+;;for each of this integers, filter the result sequence to keep only
+;;the even elements, and accumulate the results into a list
+(define (new-even-fibs n)
+  (accumulate
+   cons
+   nil
+   (filter even? (map fib (enumrate-interval 0 n)))))
+;;test
+; (new-even-fibs 8)
+
+;;list-fib-squares
+(define (list-fib-squares n)
+  (accumulate cons nil (map square (map fib (enumrate-interval 0 n)))))
+;;test
+(list-fib-squares 10)
