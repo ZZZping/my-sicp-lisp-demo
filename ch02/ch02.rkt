@@ -396,7 +396,23 @@
 ; (new-even-fibs 8)
 
 ;;list-fib-squares
+;;We can reuse pieces from sum-odd-squares and even-fibs procedures in a
+;;program that constructs a list of the squares of the first n+1 Fibonacci
+;;numbers.
 (define (list-fib-squares n)
   (accumulate cons nil (map square (map fib (enumrate-interval 0 n)))))
 ;;test
-(list-fib-squares 10)
+; (list-fib-squares 10)
+(define (product-of-squares-of-odd-elements sequence)
+  (accumulate * 1 (map square (filter odd? sequence))))
+;;test
+; (product-of-squares-of-odd-elements (list 1 2 3 4 5 6 7))
+
+;;A PICTURE LANGUAGR
+; (define wave2 (beside wave (flip-vert wave)))
+; (define wave4 (below wave2 wave2))
+
+(define (flipped-pairs painter)
+  (let ((painter2 (beside painter (flip-vert painter))))
+    (below painter2 painter2)))
+(define wave4 (flipped-pairs wave))
