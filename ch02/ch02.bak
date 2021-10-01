@@ -1,5 +1,22 @@
 #lang sicp
-(#%require "pub_method.rkt")
+; (#%require "pub_method.rkt")
+;;square
+(define (square x) (* x x))
+(define square-lambda (lambda (x) (* x x)))
+;;fib
+(define (fib-iter a b p q count)
+  (cond ((= count 0) 0)
+        ((even? count) (fib-iter a b (+ (square p) (square q)) (* 2 (* p q)) (/ count 2)))
+        (else (fib-iter (+ (* b q) (* a (+ p q))) (+ (* b p) (* a q)) p q (- count 1)))))
+(define (fib-0 n)
+  (fib-iter 1 0 1 1 n))
+
+;;another fib
+(define (fib n)
+  (cond ((= n 0) 0)
+        ((= n 1) 1)
+        (else (+ (fib (- n 1))
+                 (fib (- n 2))))))
 ;;(define (make-rat n d) (cons n d))
 (define (make-rat n d)
   (let ((g (gcd n d)))
@@ -241,11 +258,189 @@
                                 (cons (car items) result)
                                 result))))
     (iter rest (list first))))
-(list-ref one-through-four 3)
-(length one-through-four)
-(length-iterative one-through-four)
-(append-m one-through-four one-through-four)
-(last-pairs one-through-four)
+;;map over list
+(define (scal-list items factor)
+  (if (null? items) nil
+      (cons (* (car items) factor)
+            (scal-list (cdr items) factor))))
+;;abstract map
+(define (map proc items)
+  (if (null? items) nil
+      (cons (proc (car items))
+            (map proc (cdr items)))))
+;;my map
+;;(map (lambda (x y) (+ x (* 2 y))) (list 1 2 3) (list 1 2 3))
+
+;;2.21
+(define (square-list-common items)
+  (if (null? items) nil
+      (cons (* (car items) (car items))
+            (square-list-common (cdr items)))))
+(define (square-list-map items)
+  (map (lambda (x) (* x x)) items))
+;;2.23
+(define (for-each-0 proc items)
+  (if (null? items) nil
+      (and (proc (car items)) (for-each-0 proc (cdr items)))))
+(define (for-each-1 proc items)
+  (let ((items-cdr (cdr items)))
+    (proc (car items))
+    (if (not (null? items-cdr))
+        (for-each-1 proc items-cdr)
+        true)))
+(define (for-each-2 proc items)
+  (cond ((not (null? items))
+         (proc (car items))
+         (for-each-2 proc (cdr items)))))
+;;(list-ref one-through-four 3)
+;;(length one-through-four)
+;;(length-iterative one-through-four)
+;;(append-m one-through-four one-through-four)
+;;(last-pairs one-through-four)
 (define o-t-f (list 1 2 3 4 5))
-(reverse o-t-f)
-(define one1 (list 1))
+;;(reverse o-t-f)
+;;(scal-list one-through-four 10);
+;;(map + (list 1 2 3) (list 4 5 6))
+;;(map abs (list 1 -2 3 -4 5))
+;;(map (lambda (x) (* x 2)) o-t-f)
+;;(map (lambda (x) (* x 10)) (list 1 2 3 4))
+;;(square-list-map (list 1 2 3 4))
+;;(square-list-common (list 1 2 3 4))
+;;(for-each-2 (lambda (x) (newline) (display x)) (list 1 2 3 4))
+
+;;Hierarchical Structures
+(define x (cons (list 1 2) (list 3 4)))
+;;count-leaves
+(define (count-leaves x)
+  (cond ((null? x) 0)
+        ((not (pair? x)) 1)
+        (else (+ (count-leaves (car x))
+                 (count-leaves (cdr x))))))
+
+;;(count-leaves (list (list (list 1 2 3) 4) 5))
+;;map tree
+(define (scale-tree tree factor)
+  (cond ((null? tree) nil)
+        ((not (pair? tree)) (* tree factor))
+        (else (cons (scale-tree (car tree) factor)
+                    (scale-tree (cdr tree) factor)))))
+;;test
+;;(scale-tree (list 1 (list 2 (list 3 4) 5) (list 6 7)) 10)
+
+(define (scale-tree-1 tree factor)
+  (map (lambda (sub-tree)
+         (if (pair? sub-tree) (scale-tree-1 sub-tree factor)
+              (* sub-tree factor)))
+       tree))
+;;test
+;;(scale-tree-1 (list 1 (list 2 (list 3 4) 5) (list 6 7)) 9)
+
+;;sequence as conventional interface
+;;take a tree as a argument and computes the sum of the
+;;square of the levels that are odd
+(define (sum-odd-square tree)
+  (cond ((null? tree) 0)
+        ((not (pair? tree))
+         (if (odd? tree) (square tree) 0))
+        (else (+ (sum-odd-square (car tree))
+                 (sum-odd-square (cdr tree))))))
+;;Fib(k)
+(define (even-fibs n)
+  (define (next k)
+    (if (> k n) nil
+        (let ((f (fib k)))
+          (if (even? f) (cons f (next (+ k 1)))
+              (next (+ k 1))))))
+  (next 0))
+;;sequence operations
+(define (filter predicate sequence)
+  (cond ((null? sequence) nil)
+        ((predicate (car sequence))
+         (cons (car sequence)
+               (filter predicate (cdr sequence))))
+        (else (filter predicate (cdr sequence)))))
+(filter odd? (list 1 2 3 4 5))
+; (map square (list 1 2 3 4))
+(define (accumulate op initial sequances)
+  (if (null? sequances) initial
+      (op (car sequances)
+          (accumulate op initial (cdr sequances)))))
+;;test
+; (accumulate + 10 (list 1 2 3 4 5))
+; (accumulate * 10 (list 1 2 3 4 5))
+; (accumulate cons nil (list 1 2 3 4 5))
+(define (enumrate-interval low high)
+  (if (> low high) nil
+      (cons low (enumrate-interval (+ low 1) high))))
+; (enumrate-interval 2 7)
+(define (enumrate-tree tree)
+  (cond ((null? tree) nil)
+        ((not (pair? tree)) (list tree))
+        (else (append (enumrate-tree (car tree))
+                      (enumrate-tree (cdr tree))))))
+;;test
+; (enumrate-tree (list 1 (list 2 (list 3 4)) 5))
+(define (sum-odd-squares tree)
+  (accumulate + 0 (map square (filter odd? (enumrate-tree tree)))))
+;;test
+; (sum-odd-squares (list 1 (list 2 (list 3 4) 5) (list 6 7)))
+;;ebumrate the integers from 0 to n, generate the Fibonacci number
+;;for each of this integers, filter the result sequence to keep only
+;;the even elements, and accumulate the results into a list
+(define (new-even-fibs n)
+  (accumulate
+   cons
+   nil
+   (filter even? (map fib (enumrate-interval 0 n)))))
+;;test
+; (new-even-fibs 8)
+
+;;list-fib-squares
+;;We can reuse pieces from sum-odd-squares and even-fibs procedures in a
+;;program that constructs a list of the squares of the first n+1 Fibonacci
+;;numbers.
+(define (list-fib-squares n)
+  (accumulate cons nil (map square (map fib (enumrate-interval 0 n)))))
+;;test
+; (list-fib-squares 10)
+(define (product-of-squares-of-odd-elements sequence)
+  (accumulate * 1 (map square (filter odd? sequence))))
+;;test
+; (product-of-squares-of-odd-elements (list 1 2 3 4 5 6 7))
+
+;;A PICTURE LANGUAGR
+(#%require sicp-pict)
+; (paint einstein)
+; (define wave2 (beside wave (flip-vert wave)))
+; (define wave4 (below wave2 wave2))
+
+(define (flipped-pairs painter)
+  (let ((painter2 (beside painter (flip-vert painter))))
+    (below painter2 painter2)))
+; (define wave4 (flipped-pairs wave))
+
+(define (right-split painter n)
+  (if (= n 0)
+      painter
+      (let ((smaller (right-split painter (- n 1))))
+        (beside painter (below smaller smaller)))))
+(define (up-split painter n)
+  (if (= n 0)
+      painter
+      (let ((smaller (up-split painter (- n 1))))
+        (below painter (beside smaller smaller)))))
+(define (corner-split painter n)
+  (if (= n 0) painter
+      (let ((up (up-split painter (- n 1)))
+            (right (right-split painter (- n 1))))
+        (let ((top-left (beside up up))
+              (bottom-right (below right right))
+              (corner (corner-split painter (- n 1))))
+          (beside (below painter top-left)
+                  (below bottom-right corner))))))
+(define (square-limit painter n)
+  (let ((quarter (corner-split painter n)))
+    (let ((half (beside (flip-horiz quarter) quarter)))
+      (below (filp-vert half) half))))
+;test
+; (paint (right-split einstein 3))
