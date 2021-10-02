@@ -412,6 +412,7 @@
 (#%require sicp-pict)
 ; (paint einstein)
 ;(define wave2 (beside wave (flip-vert wave)))
+; (define wave2 (beside wave (flip-vert wave)))
 ; (define wave4 (below wave2 wave2))
 
 (define (flipped-pairs painter)
@@ -481,3 +482,5 @@
 (define (scale-vect s vec)
   (make-vect (* s (xcor-vect vec))
              (* s (ycor-vect vec))))
+;test
+; (paint (right-split einstein 3))
