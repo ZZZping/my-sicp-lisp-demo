@@ -467,6 +467,10 @@
   (lambda (v) (add-vect (origin-frame frame)
                         (add-vect (scale-vect (xcor-vect v) (edge1-frame frame))
                                   (scale-vect (ycor-vect v) (edge2-frmae frame))))))
+(define (origin-frame frame) (car frame))
+(define (edge1-frame) (car (cdr frame)))
+(define (edge2-frmae) (car (cdr (cdr frame))))
+;;ex2.46
 (define (make-vect x y) (cons x y))
 (define (xcor-vect vec) (car vec))
 (define (ycor-vect vec) (cdr vec))
@@ -477,10 +481,29 @@
   (make-vect (+ (xcor-vect v1) (xcor-vect v2))
              (+ (ycor-vect v1) (ycor-vect v2))))
 (define (sub-vect v1 v2)
-  (maker-vect (- (xcor-vect v1) (xcor-vect v2))
+  (make-vect (- (xcor-vect v1) (xcor-vect v2))
               (- (ycor-vect v1) (ycor-vect v2))))
 (define (scale-vect s vec)
   (make-vect (* s (xcor-vect vec))
              (* s (ycor-vect vec))))
+;;ex2.47
+(define (make-frame origin edge1 edge2)
+  (list origin edge1 edge2))
+(define (frame-origin f) (car f))
+(define (frame-edge1 f) (cadr f))
+(define (frame-edge2 f) (caddr f))
+;;painters
+(define (segments->painter segment-list)
+  (lambda (frame)
+    (for-each
+     (lambda (segment)
+       (draw-line
+        ((frame-coord-map frame)
+         (start-segment segment))
+        ((frame-coord-map frame)
+         (end-segment segment))))
+     segment-list)))
+;;ex2.48
+
 ;test
 ; (paint (right-split einstein 3))
