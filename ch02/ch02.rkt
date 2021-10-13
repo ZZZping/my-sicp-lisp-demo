@@ -503,7 +503,49 @@
         ((frame-coord-map frame)
          (end-segment segment))))
      segment-list)))
-;;ex2.48
+;;ex2.49
+(let ((tl (make-vect 0 1))
+      (tr (make-vect 1 1))
+      (bl (make-vect 0 0))
+      (br (make-vect 1 0)))
+  ;a
+  (segments->painter (list
+                      (make-segment bl tl)
+                      (make-segment tl tr)
+                      (make-segment tr br)
+                      (make-segment br bl)))
+  ;b
+  (segments->painter (list
+                      (make-segment bl tr)
+                      (make-segment br tl))))
+(let ((l (make-vect 0 0.5))
+      (t (make-vect 0.5 1))
+      (r (make-vect 1 0.5))
+      (b (make-vect 0.5 0)))
+  ;c
+  (segments->painter (list
+                      (make-segment l t)
+                      (make-segment t r)
+                      (make-segment r b)
+                      (make-segment b l))))
+;;Transforming and combining painters
+(define (transform-painter origin corner1 corner2)
+  (lambda (frame)
+    (let ((new-origin (m origin)))
+      (painter (make-frame
+                new-origin
+                (sub-vect (m corner1) new-origin)
+                (sub-vect (m corner2) new-origin))))))
+(define (new-flip-vert painter)
+  (transform-painter painter
+                     (make-vect 0.0 1.0)
+                     (make-vect 1.0 1.0)
+                     (make-vect 0.0 0.0)))
+(define (shrink-to-upper-right painter)
+  (transform-painter painter
+                     (make-vect 0.5 0.5)
+                     (make-vect 1.0 0.5)
+                     (make-vect 0.5 1.0)))
 
 ;test
 ; (paint (right-split einstein 3))
