@@ -546,6 +546,70 @@
                      (make-vect 0.5 0.5)
                      (make-vect 1.0 0.5)
                      (make-vect 0.5 1.0)))
-
+;;rotate image counterclockwise 90 degrees
+(define (transform-paintyer-rotate90 painter)
+  (transform-painter painter
+                     (make-vect 1.0 0.0)
+                     (make-vect 1.0 1.0)
+                     (make-vect 0.0 0.0)))
+;;squash images towards the center of the frame
+(define (transform-painter-squash-inwards painter)
+  (transform-painter painter
+                     (make-vect 0.0 0.0)
+                     (make-vect 0.65 0.35)
+                     (make-vect 0.35 0.65)))
+(define (beside painter1 painter2)
+  (let ((split-point (make-vect 0.5 0.0)))
+    (let ((paint-left
+           (transform-painter
+                              painter1
+                              (make-vect 0.0 0.0)
+                              split-point
+                              (make-vect 0.0 1.0)))
+          (paint-right
+           (transform-painter
+                              painter2
+                              split-point
+                              (make-vect 1.0 0.0)
+                              (make-vect 0.5 1.0))))
+      (lambda (frame)
+        (paint-left frame)
+        (paint-right frame)))))
+;;ex2.50
+;;Define the transfromation flip-horiz, which flips painters horizontally, and transformations that rotate painters counterclockwise by 180 degrees and 270 degrees
+(define (transform-painter-flip-horiz painter)
+  (transform-painter painter
+                     (make-vect 1.0 0.0)
+                     (make-vect 0.0 0.0)
+                     (make-vect 1.0 1.0)))
+(define (repeated fn t)
+  (if (= t 1)
+      fn
+      (lambda (x)
+        (fn ((repeated fn (- t 1))
+             x)))))
+(define (repeated-rotate180 painter)
+  ((repeated transform-paintyer-rotate90 2) painter))
+(define (repeated-rotate270 painter)
+  ((repeated transform-paintyer-rotate90 3) painter))
+;;ex2.51
+(define (below painter1 painter2)
+  (let ((split-point (make-vect 0.0 0.5)))
+    (let ((paint-bottom
+           (transform-painter painter1
+                              (make-vect 0.0 0.0)
+                              (make-vect 1.0  0;0)
+                              split-point))
+          (paint-top
+           (transform-painter painter2
+                              split-point
+                              (make-vect 1.0 0.5)
+                              (make-vect 0.0 1.0))))
+      (lambda (frame)
+        (paint-bottom frame)
+        (paint-top frame)))))
+(define (below-2 painter1 painter2)
+  (transform-paintyer-rotate90 (beside (repeated-rotate270 painter1) (repeated-rotate270 painter2))))
+;;Levels of language for robust design
 ;test
 ; (paint (right-split einstein 3))
