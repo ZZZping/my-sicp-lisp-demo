@@ -52,6 +52,35 @@
         ((and (pair? list1) (pair? list2))
          (and (equal? (car list1) (car list2)) (equal? (cdr list1) (cdr list2))))
         (else false)))
+;;
+(define (equal1? a b)
+  (if (or (eq? a b)
+      (and
+           (or
+               (and
+                    (pair? a)
+                    (pair? b))
+               (and
+                    (null? a)
+                    (null? b)))
+           (and
+                (equal1? (car a) (car b))
+                (equal1? (cdr a) (cdr b)))))
+      #t #f))
+
+(define (equal2? a b)
+  (or (eq? a b)
+      (and (or (and (pair? a) (pair? b))
+               (and (null? a) (null? b)))
+           (and (equal2? (car a) (car b))
+                (equal2? (cdr a) (cdr b))))))
+(define (equal3? a b)
+  (if (and (pair? a) (pair? b))
+      (cond ((null? a) (null? b))
+            ((null? b) false)
+            ((equal3? (car a) (car b)) (equal3? (cdr a) (cdr b)))
+            (else false))
+      (eq? a b)))
 
 ;;ex2.55
 ;;(car ''abracadabra) ;;(car '(quote abracadabra))
@@ -63,6 +92,6 @@
 ;;test
 ;;(memq 'apple '(orange banana prune pear));;false
 ;;(memq 'apple '(x (apple banana) y apple pear));;(apple pear)
-;;(equal? '(1 2 3 (4 5) 6) '(1 2 3 (4 5) 6))
-;;(equal? '(this is a list) '(this is a list))
-;;(equal? '(this is a list) '(this (is a) list))
+;;(equal1? '(1 2 3 (4 5) 6) '(1 2 3 (4 5) 6))
+;;(equal1? '(this is a list) '(this is a list))
+;;(equal1? '(this is a list) '(this (is a) list))
