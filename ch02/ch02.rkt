@@ -611,5 +611,25 @@
 (define (below-2 painter1 painter2)
   (transform-paintyer-rotate90 (beside (repeated-rotate270 painter1) (repeated-rotate270 painter2))))
 ;;Levels of language for robust design
+;;ex2.52
+;;a
+(define wave
+  (segments->painter (list
+                      ;;...
+                      (make-segment (make-vert 0.44 0.7) (make-vert 0.51 0.7)))))
+;;b
+(define (ex-corner-split painter n)
+  (if (= n 0)
+      painter
+      (beside (below painter (up-split painter (- n 1)))
+              (below (right-split painter (- n 1)) (corner-split painter (- n 1))))))
+;;c
+(define (ex-square-limit painter n)
+  (let ((combine4 (square-of-four flip-vert rotate180 identity flip-horiz)))
+    (combine4 (corner-split painter n))))
+
+;;Symnolic Data
+;;In this section we extend the representational capability of our language by introducing the ability to work with arbitrary symbols as data.
+;;;Quotation
 ;test
 ; (paint (right-split einstein 3))
