@@ -1,0 +1,23 @@
+#lang sicp
+(define (abs-cond x)
+  (cond ((> x 0) x)
+        ((= x 0) 0)
+        ((< x 0) (- x))));
+
+(define (abs-cond-else x)
+  (cond ((< x 0) (- x))
+        (else x)));
+
+(define (abs-if x)
+  (if (< x 0)
+      (- x)
+      x));
+
+(define (>= x y)
+  (or (> x y) (= x y)));
+
+(define (>=1 x y)
+  (not (< x y)));
+(define x (cons 1 2))
+(car x)
+

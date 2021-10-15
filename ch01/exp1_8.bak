@@ -1,0 +1,8 @@
+#lang sicp
+;;define 2x function
+(define (double x)
+  (+ x x));
+
+;;
+(define (square x)
+  (exp (double (log x))));

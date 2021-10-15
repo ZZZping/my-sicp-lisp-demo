@@ -1,0 +1,45 @@
+#lang sicp
+;;define + 0.0
+;;(inc a) === a = a + 1
+;;(dec a) === a = a - 1
+;;recursive
+(define (+ a b)
+  (if (= a 0)
+      b
+      (inc (+ (dec a) b))));
+;;(+ 1 2) === (inc (+ (dec 1) 2)) === (inc (+ 0 2)) === (inc 2) = 3
+;;make a to be a-1 when a > 0
+;;(+ 4 5)
+;;(inc (+ 3 5))
+;;(inc (inc (+ 2 5)))
+;;(inc (inc (inc (+ 1 5))))
+;;(inc (inc (inc (inc (+ 0 5)))))
+;;(inc (inc (inc (inc 5))))
+;;(inc (inc (inc 6)))
+;;(inc (inc 7))
+;;(inc 8)
+;;9
+
+
+;;define + 0.1; when a-1 then b+1
+;;iterative
+(define (++ a b)
+  (if (= a 0)
+      b
+      (++ (dec a) (inc b))))
+;;(+1 4 5)
+;;(+1 3 6)
+;;(+1 2 7)
+;;(+1 1 8)
+;;(+1 0 9)
+
+;;Ackermann function
+(define (Ackermann x y)
+  (cond ((= y 0) 0)
+        ((= x 0) (* 2 y))
+        ((= y 1) 2)
+        (else (Ackermann (- x 1) (Ackermann x (- y 1))))));
+
+(define (f n) (Ackermann 0 n));
+(define (g n) (Ackermann 1 n));
+(define (h n) (Ackermann 2 n));

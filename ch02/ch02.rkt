@@ -627,9 +627,5 @@
 (define (ex-square-limit painter n)
   (let ((combine4 (square-of-four flip-vert rotate180 identity flip-horiz)))
     (combine4 (corner-split painter n))))
-
-;;Symnolic Data
-;;In this section we extend the representational capability of our language by introducing the ability to work with arbitrary symbols as data.
-;;;Quotation
 ;test
 ; (paint (right-split einstein 3))
