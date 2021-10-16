@@ -90,22 +90,48 @@
 ;;(cdr '('1111))
 
 ;;symbolic differentiation
+
+;;Is x is a variable.
+;;The variable are symbols. Idenfined by the primitive predicate symbol?
 (define (variable? x) (symbol? x))
-(define (same-variable? v1 v2)
-  (and (variable? v1) (variable? v2) (eq? v1 v2)))
+;;Are v1 and v2 the same variable.
+;;Two variables are the same if the symbols representing them are eq?
+(define (same-variable? v1 v2) (and (variable? v1) (variable? v2) (eq? v1 v2)))
+;;Construct the sum of a1 and a2
+;;Sums is constructed as list
 (define (make-sum a1 a2) (list '+ a1 a2))
+;;Construct the product of m1 and m2
+;;Product is constructed as list
 (define (make-product m1 m2) (list '* m1 m2))
+;;Is x a sum?
+;;A sum is a list whose first element is the symbol +
+;;(+ addend augend) <=> addend + augend
 (define (sum? x) (and (pair? x) (eq? (car x) '+)))
+;;Addend of the sum s
+;;The addend is the second item of sum list
 (define (addend s) (cadr s))
+;;Augend of the sum s
+;;The augend is the third item of sum list
 (define (augend s) (caddr s))
+;;Is x a product
+;;A product is a list whose first element is the symbol *
 (define (product? x) (and (pair? x) (eq? (car x) '*)))
+;;Multiplier of the product p
+;;The multiplier is the second item of product list
 (define (multiplier p) (cadr p))
+;;Multiplicand of the product p
+;;The multiplicand is the third item of product list
 (define (multiplicand p) (caddr p))
+
 (define (deriv exp var)
   (cond ((number? exp) 0)
-        ((variable? exp) (if (same-variable? exp var) 1 0))
-        ((sum? exp) (make-sum (deriv (addend exp) var)
-                              (deriv (augend exp) var)))
+        ((variable? exp) (if
+                           (same-variable? exp var)
+                           1
+                           0))
+        ((sum? exp) (make-sum
+                     (deriv (addend exp) var)
+                     (deriv (augend exp) var)))
         ((product? exp) (make-sum
                                   (make-product (multiplier exp)
                                                 (deriv (multiplicand exp) var))
@@ -120,3 +146,7 @@
 ;;(equal1? '(1 2 3 (4 5) 6) '(1 2 3 (4 5) 6))
 ;;(equal1? '(this is a list) '(this is a list))
 ;;(equal1? '(this is a list) '(this (is a) list))
+(deriv '(+ x 3) 'x)
+(deriv '(* x y) 'x)
+(deriv '(* x y) 'y)
+(deriv '(* (* x y) (+ x 3)) 'x)
