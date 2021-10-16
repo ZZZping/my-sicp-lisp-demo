@@ -161,6 +161,62 @@
         (else
          (error "unknown expression type: DERIV" exp))))
 
+;;ex2.56
+(define (exponentiation? exp)
+  (and (pair? exp) (eq? (car exp) '**)))
+(define (base exp)
+  (cadr exp))
+(define (exponent exp)
+  (caddr exp))
+;;(define (make-exponentiation base exp)
+;;  (cond ((=number? base 1) 1)
+;;         ((=number? exp 1) base)
+;;         ((=number? exp 0) 1)
+;;         (else (list '** exp base))))
+;;simplify make-exponetitation
+(define (make-exponentiation base exp)
+  (cond ((=number? base 1) 1)
+        ((=number? exp 0) 1)
+        ((=number? exp 1) base)
+        ((and (number? base) (number? exp)) (expt base exp))
+        (else (list '** base exp))))
+(define (advanced-deriv exp var)
+  (cond ((number? exp) 0)
+        ((variable? exp) (if (same-variable? exp var) 1 0))
+        ((sum? exp) (make-sum (advanced-deriv (addend exp) var) (advanced-deriv (augend exp) var)))
+        ((product? exp) (let ((m1 (multiplier exp)) (m2 (multiplicand exp)))
+                          (make-sum (make-product (advanced-deriv m1 var) m2) (make-product m1 (advanced-deriv m2 var)))))
+        ((and (exponentiation? exp) (=number? (advanced-deriv (exponent exp) var) 0))
+         (let ((b (base exp)) (e (exponent exp)))
+           (make-product (advanced-deriv b var) (make-product e (make-exponentiation b (make-sum e -1))))))
+        (else (list 'advanced-deriv exp var))))
+(define (exponent-deriv exp var)
+  (cond ((number? exp) 0)
+        ((variable? exp)
+         (if (same-variable? exp var) 1 0))
+        ((sum? exp) (make-sum (exponent-deriv (addend exp) var) (exponent-deriv (augend exp) var)))
+        ((product? exp)
+         (make-sum
+          (make-product (multiplier exp) (exponent-deriv (multiplicand exp) var))
+          (make-product (exponent-deriv (multiplier exp) var) (multiplicand exp))))
+        ((exponentiation? exp)
+         (make-product
+          (make-product
+           (exponent exp)
+           (make-exponentiation
+            (base exp)
+            (if
+              (number?
+               (exponent exp))
+              (- (exponent exp) 1)
+              ('(- (exponent exp) 1)))))
+          (exponent-deriv (base exp) var)))
+        (else (error "unknown expression type -- DERIV" exp))))
+
+;;ex2.57
+
+;;ex2.58
+
 ;;test
 ;;(memq 'apple '(orange banana prune pear));;false
 ;;(memq 'apple '(x (apple banana) y apple pear));;(apple pear)
