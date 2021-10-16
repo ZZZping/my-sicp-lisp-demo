@@ -99,10 +99,32 @@
 (define (same-variable? v1 v2) (and (variable? v1) (variable? v2) (eq? v1 v2)))
 ;;Construct the sum of a1 and a2
 ;;Sums is constructed as list
-(define (make-sum a1 a2) (list '+ a1 a2))
+;;(define (make-sum a1 a2) (list '+ a1 a2))
+;;We change make-sum so that if both summands are numbers,
+;;make-sum will add them and return their sum. Also if one
+;;of the summands is 0, then make-sum will return the other
+;;summand.
+(define (make-sum a1 a2)
+  (cond ((=number? a1 0) a2)
+        ((=number? a2 0) a1)
+        ((and (number? a1) (number? a2))
+         (+ a1 a2))
+        (else (list '+ a1 a2))))
+;;define =number? function
+;;This checks whether an expression is equal to a given number.
+(define (=number? exp num)
+  (and (number? exp) (= exp num)))
 ;;Construct the product of m1 and m2
 ;;Product is constructed as list
-(define (make-product m1 m2) (list '* m1 m2))
+;;(define (make-product m1 m2) (list '* m1 m2))
+;;Similarly, we will redefine make-product in the rules that 0
+;;times anything is 0 and 1 times anything is the thing itself
+(define (make-product m1 m2)
+  (cond ((or (=number? m1 0) (=number? m2 0)) 0)
+        ((=number? m1 1) m2)
+        ((=number? m2 1) m1)
+        ((and (number? m1) (number? m2)) (* m1 m2))
+        (else (list '* m1 m2))))
 ;;Is x a sum?
 ;;A sum is a list whose first element is the symbol +
 ;;(+ addend augend) <=> addend + augend
@@ -125,18 +147,17 @@
 
 (define (deriv exp var)
   (cond ((number? exp) 0)
-        ((variable? exp) (if
-                           (same-variable? exp var)
-                           1
-                           0))
+        ((variable? exp) (if (same-variable? exp var) 1 0))
         ((sum? exp) (make-sum
                      (deriv (addend exp) var)
                      (deriv (augend exp) var)))
         ((product? exp) (make-sum
-                                  (make-product (multiplier exp)
-                                                (deriv (multiplicand exp) var))
-                                  (make-product (deriv (multiplier exp) var)
-                                                (multiplicand exp))))
+                         (make-product
+                          (multiplier exp)
+                          (deriv (multiplicand exp) var))
+                         (make-product
+                          (deriv (multiplier exp) var)
+                          (multiplicand exp))))
         (else
          (error "unknown expression type: DERIV" exp))))
 
@@ -146,7 +167,7 @@
 ;;(equal1? '(1 2 3 (4 5) 6) '(1 2 3 (4 5) 6))
 ;;(equal1? '(this is a list) '(this is a list))
 ;;(equal1? '(this is a list) '(this (is a) list))
-(deriv '(+ x 3) 'x)
-(deriv '(* x y) 'x)
-(deriv '(* x y) 'y)
-(deriv '(* (* x y) (+ x 3)) 'x)
+;;(deriv '(+ x 3) 'x)
+;;(deriv '(* x y) 'x)
+;;(deriv '(* x y) 'y)
+;;(deriv '(* (* x y) (+ x 3)) 'x)
