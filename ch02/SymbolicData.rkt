@@ -104,12 +104,22 @@
 ;;make-sum will add them and return their sum. Also if one
 ;;of the summands is 0, then make-sum will return the other
 ;;summand.
+;;(define (make-sum a1 a2)
+;;  (cond ((=number? a1 0) a2)
+;;        ((=number? a2 0) a1)
+;;        ((and (number? a1) (number? a2))
+;;         (+ a1 a2))
+;;        (else (list '+ a1 a2))))
+;;we can redefine make-sum again
+(define (make-sum-list l)
+  (if (= (length l) 2)
+      (list '+ (car l) (cadr l))
+      (make-sum (car l) (make-sum-list (cdr l)))))
 (define (make-sum a1 a2)
   (cond ((=number? a1 0) a2)
         ((=number? a2 0) a1)
-        ((and (number? a1) (number? a2))
-         (+ a1 a2))
-        (else (list '+ a1 a2))))
+        ((and (number? a1) (number? a2)) (+ a1 a2))
+        (else (make-sum-list (list a1 a2)))))
 ;;define =number? function
 ;;This checks whether an expression is equal to a given number.
 (define (=number? exp num)
@@ -119,12 +129,23 @@
 ;;(define (make-product m1 m2) (list '* m1 m2))
 ;;Similarly, we will redefine make-product in the rules that 0
 ;;times anything is 0 and 1 times anything is the thing itself
+;;(define (make-product m1 m2)
+;;  (cond ((or (=number? m1 0) (=number? m2 0)) 0)
+;;        ((=number? m1 1) m2)
+;;        ((=number? m2 1) m1)
+;;        ((and (number? m1) (number? m2)) (* m1 m2))
+;;        (else (list '* m1 m2))))
+;;redefine make-product
+(define (make-product-list l)
+  (if (= (length l) 2)
+      (list '* (car l) (cadr l))
+      (make-product (car l) (make-product-list (cdr l)))))
 (define (make-product m1 m2)
   (cond ((or (=number? m1 0) (=number? m2 0)) 0)
         ((=number? m1 1) m2)
         ((=number? m2 1) m1)
         ((and (number? m1) (number? m2)) (* m1 m2))
-        (else (list '* m1 m2))))
+        (else (make-product-list (list m1 m2)))))
 ;;Is x a sum?
 ;;A sum is a list whose first element is the symbol +
 ;;(+ addend augend) <=> addend + augend
@@ -134,7 +155,13 @@
 (define (addend s) (cadr s))
 ;;Augend of the sum s
 ;;The augend is the third item of sum list
-(define (augend s) (caddr s))
+;;(define (augend s) (caddr s))
+;;redefine augend
+(define (augend s)
+  (let ((a (cddr s)))
+    (if (= (length a) 1)
+        (car a)
+        (make-sum-list a))))
 ;;Is x a product
 ;;A product is a list whose first element is the symbol *
 (define (product? x) (and (pair? x) (eq? (car x) '*)))
@@ -143,7 +170,13 @@
 (define (multiplier p) (cadr p))
 ;;Multiplicand of the product p
 ;;The multiplicand is the third item of product list
-(define (multiplicand p) (caddr p))
+;;(define (multiplicand p) (caddr p))
+;;redefine multiplicand
+(define (multiplicand p)
+  (let ((m (cddr p)))
+    (if (= (length m) 1)
+        (car m)
+        (make-product-list m))))
 
 (define (deriv exp var)
   (cond ((number? exp) 0)
@@ -214,7 +247,7 @@
         (else (error "unknown expression type -- DERIV" exp))))
 
 ;;ex2.57
-
+;;ex2.57 is make-sum-list and make-product-list
 ;;ex2.58
 
 ;;test
@@ -227,3 +260,4 @@
 ;;(deriv '(* x y) 'x)
 ;;(deriv '(* x y) 'y)
 ;;(deriv '(* (* x y) (+ x 3)) 'x)
+;;(deriv '(* x y (+ x 3)) 'x)
