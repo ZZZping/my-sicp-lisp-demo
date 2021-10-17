@@ -249,6 +249,55 @@
 ;;ex2.57
 ;;ex2.57 is make-sum-list and make-product-list
 ;;ex2.58
+;;use infix rather than prefix operatoras
+;;some infix sum modules
+(define (infix-make-sum a1 a2)
+  (cond ((=number? a1 0) a2)
+        ((=number? a2 0) a1)
+        (else (list a1 '+ a2))))
+(define (infix-sum? x)
+  (and (pair? x) (eq? (cadr x) '+)))
+(define (infix-addend s) (car s))
+;;(define (infix-augend s) (caddr s))
+
+;;some infix product modules
+(define (infix-make-product m1 m2)
+  (cond ((=number? m1 1) m2)
+        ((=number? m2 1) m1)
+        ((or (=number? m1 0) (=number? m2 0)) 0)
+        (else (list m1 '* m2))))
+(define (infix-product? x)
+  (and (pair? x) (eq? (cadr x) '*)))
+(define (infix-multiplier p) (car p))
+;;(define (infix-multiplicand p) (caddr p))
+
+;;We can not use cadr to get augend or the multiplicand because
+;;they might be more than one item, so we have to use cddr, but
+;;the problem with cddr is that it returns a list, so we can make
+;;a new module cleanning
+(define (cleaner sequence)
+  (if (null? (cdr sequence))
+      (car sequence)
+      sequence))
+(define (infix-augend x) (cleaner (cddr x)))
+(define (infix-multiplicand x) (cleaner (cddr x)))
+
+(define (infix-deriv exp var)
+  (cond ((number? exp) 0)
+        ((variable? exp) (if (same-variable? exp var) 1 0))
+        ((infix-sum? exp) (infix-make-sum
+                     (infix-deriv (addend exp) var)
+                     (infix-deriv (infix-augend exp) var)))
+        ((infix-product? exp) (infix-make-sum
+                         (infix-make-product
+                          (infix-multiplier exp)
+                          (infix-deriv (infix-multiplicand exp) var))
+                         (infix-make-product
+                          (infix-deriv (infix-multiplier exp) var)
+                          (infix-multiplicand exp))))
+        (else
+         (error "unknown expression type: DERIV" exp))))
+
 
 ;;test
 ;;(memq 'apple '(orange banana prune pear));;false
