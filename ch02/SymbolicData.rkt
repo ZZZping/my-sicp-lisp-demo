@@ -298,6 +298,31 @@
         (else
          (error "unknown expression type: DERIV" exp))))
 
+;;Representing Set
+;;a set is as a list of its elements in which no element appears more than once
+;;define element-of-set?, this module check whether the element is in the set
+;;For any object x,(element-of-set x '()) is false. No object is an element of the empty set
+(define (element-of-set? x set)
+  (cond ((null? set) false)
+        ((equal? x (car set)) true)
+        (else (element-of-set? x (cdr set)))))
+;;adjoin-set
+;;if set contains x, return this set, otherwise add x into set
+(define (adjoin-set x set)
+  (if (element-of-set? x set) set
+      (cons x set)))
+;;intersection-set
+;;We use a recursive strategy to get the intersection-set of
+;;set1 and set2.
+(define (intersection-set set1 set2)
+  (cond ((or (null? set1) (null? set2)) '())
+        ((element-of-set? (car set1) set2)
+         (cons (car set1) (intersection-set (cdr set1) set2)))
+        (else (intersection-set (cdr set1) set2))))
+
+;;ex2.59
+;;ex2.60
+
 
 ;;test
 ;;(memq 'apple '(orange banana prune pear));;false
