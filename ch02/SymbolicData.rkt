@@ -306,6 +306,11 @@
   (cond ((null? set) false)
         ((equal? x (car set)) true)
         (else (element-of-set? x (cdr set)))))
+;;element-not-of-set
+(define (element-not-of-set? x set)
+  (cond ((null? set) true)
+        ((not (equal? x (car set))) true)
+        (else (element-not-of-set? x (cdr set)))))
 ;;adjoin-set
 ;;if set contains x, return this set, otherwise add x into set
 (define (adjoin-set x set)
@@ -321,6 +326,20 @@
         (else (intersection-set (cdr set1) set2))))
 
 ;;ex2.59
+;;union-set
+;;two empty set; one of the set is empty set; two normal set
+(define (union-set-m set1 set2)
+  (cond ((and (null? set1) (null? set2)) '())
+        ((null? set1) set2)
+        ((null? set2) set1)
+        ((element-not-of-set? (car set1) set2)
+         (cons (car set1) (union-set-m (cdr set1) set2)))
+        (else (union-set-m (cdr set1) set2))))
+(define (union-set s1 s2)
+  (cond ((and (null? s1) (not (null? s2))) s2)
+        ((and (not (null? s1)) (null? s2)) s1)
+        ((element-of-set? (car s1) s2) (union-set (cdr s1) s2))
+        (else (cons (car s1) (union-set (cdr s1) s2)))))
 ;;ex2.60
 
 
@@ -335,3 +354,10 @@
 ;;(deriv '(* x y) 'y)
 ;;(deriv '(* (* x y) (+ x 3)) 'x)
 ;;(deriv '(* x y (+ x 3)) 'x)
+(define odd '(1 3 5 7 9))
+(define evens '(2 4 6 8))
+;;(element-of-set? 1 odd)
+;;(intersection-set odd evens)
+;;(union-set odd evens)
+;;(element-not-of-set? 1 evens)
+;;(union-set-m evens odd)
