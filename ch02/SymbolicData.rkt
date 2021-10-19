@@ -302,9 +302,14 @@
 ;;a set is as a list of its elements in which no element appears more than once
 ;;define element-of-set?, this module check whether the element is in the set
 ;;For any object x,(element-of-set x '()) is false. No object is an element of the empty set
+;;(define (element-of-set? x set)
+;;  (cond ((null? set) false)
+;;        ((equal? x (car set)) true)
+;;        (else (element-of-set? x (cdr set)))))
 (define (element-of-set? x set)
   (cond ((null? set) false)
-        ((equal? x (car set)) true)
+        ((= x (car set)) true)
+        ((< x (car set)) false)
         (else (element-of-set? x (cdr set)))))
 ;;element-not-of-set
 (define (element-not-of-set? x set)
@@ -333,11 +338,19 @@
           ((equal? x (car rset)) (append acc (cdr rset)))
           (else (remove-set-element-iter (adjoin-set (car rset) acc) (cdr rset)))))
   (remove-set-element-iter '() set))
+;;(define (intersection-set set1 set2)
+;;  (cond ((or (null? set1) (null? set2)) '())
+;;        ((element-of-set? (car set1) set2)
+;;         (cons (car set1) (intersection-set (cdr set1) (remove-set-element (car set1) set2))))
+;;        (else (intersection-set (cdr set1) set2))))
+;;define intersection-set of ordered set
 (define (intersection-set set1 set2)
-  (cond ((or (null? set1) (null? set2)) '())
-        ((element-of-set? (car set1) set2)
-         (cons (car set1) (intersection-set (cdr set1) (remove-set-element (car set1) set2))))
-        (else (intersection-set (cdr set1) set2))))
+  (if (or (null? set1) (null? set2))
+      '()
+      (let ((x1 (car set1)) (x2 (car set2)))
+        (cond ((= x1 x2) (cons x1 (intersection-set (cdr set1) (cdr set2))))
+              ((< x1 x2) (intersection-set (cdr set1) set2))
+              ((< x2 x1) (intersection-set set1 (cdr set2)))))))
 
 ;;ex2.59
 ;;union-set
@@ -355,8 +368,9 @@
 ;;        ((element-of-set? (car s1) s2) (union-set (cdr s1) s2))
 ;;        (else (cons (car s1) (union-set (cdr s1) s2)))))
 (define (union-set s1 s2) (append s1 s2))
-;;ex2.60
 
+;;ex2.61
+;;ex2.62
 
 ;;test
 ;;(memq 'apple '(orange banana prune pear));;false
@@ -371,8 +385,11 @@
 ;;(deriv '(* x y (+ x 3)) 'x)
 (define odd '(1 3 5 7 9))
 (define evens '(2 4 6 8))
+(define s1 '(1 2 3 4 5))
 ;;(element-of-set? 1 odd)
 ;;(intersection-set odd evens)
-;;(union-set odd evens)
+(intersection-set odd s1)
+;;(intersection-set odd evens)
+;;(union-set odd s1)
 ;;(element-not-of-set? 1 evens)
 ;;(union-set-m evens odd)
