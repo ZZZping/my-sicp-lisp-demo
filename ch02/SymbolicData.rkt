@@ -313,16 +313,30 @@
         (else (element-not-of-set? x (cdr set)))))
 ;;adjoin-set
 ;;if set contains x, return this set, otherwise add x into set
+;;(define (adjoin-set x set)
+;;  (if (element-of-set? x set) set
+;;      (cons x set)))
 (define (adjoin-set x set)
-  (if (element-of-set? x set) set
-      (cons x set)))
+  (cons x set))
 ;;intersection-set
 ;;We use a recursive strategy to get the intersection-set of
 ;;set1 and set2.
+;;(define (intersection-set set1 set2)
+;;  (cond ((or (null? set1) (null? set2)) '())
+;;        ((element-of-set? (car set1) set2)
+;;         (cons (car set1) (intersection-set (cdr set1) set2)))
+;;        (else (intersection-set (cdr set1) set2))))
+
+(define (remove-set-element x set)
+  (define (remove-set-element-iter acc rset)
+    (cond ((null? rset) acc)
+          ((equal? x (car rset)) (append acc (cdr rset)))
+          (else (remove-set-element-iter (adjoin-set (car rset) acc) (cdr rset)))))
+  (remove-set-element-iter '() set))
 (define (intersection-set set1 set2)
   (cond ((or (null? set1) (null? set2)) '())
         ((element-of-set? (car set1) set2)
-         (cons (car set1) (intersection-set (cdr set1) set2)))
+         (cons (car set1) (intersection-set (cdr set1) (remove-set-element (car set1) set2))))
         (else (intersection-set (cdr set1) set2))))
 
 ;;ex2.59
@@ -335,11 +349,12 @@
         ((element-not-of-set? (car set1) set2)
          (cons (car set1) (union-set-m (cdr set1) set2)))
         (else (union-set-m (cdr set1) set2))))
-(define (union-set s1 s2)
-  (cond ((and (null? s1) (not (null? s2))) s2)
-        ((and (not (null? s1)) (null? s2)) s1)
-        ((element-of-set? (car s1) s2) (union-set (cdr s1) s2))
-        (else (cons (car s1) (union-set (cdr s1) s2)))))
+;;(define (union-set s1 s2)
+;;  (cond ((and (null? s1) (not (null? s2))) s2)
+;;        ((and (not (null? s1)) (null? s2)) s1)
+;;        ((element-of-set? (car s1) s2) (union-set (cdr s1) s2))
+;;        (else (cons (car s1) (union-set (cdr s1) s2)))))
+(define (union-set s1 s2) (append s1 s2))
 ;;ex2.60
 
 
