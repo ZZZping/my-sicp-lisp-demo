@@ -321,8 +321,8 @@
 ;;(define (adjoin-set x set)
 ;;  (if (element-of-set? x set) set
 ;;      (cons x set)))
-(define (adjoin-set x set)
-  (cons x set))
+;;(define (adjoin-set x set)
+;;  (cons x set))
 ;;intersection-set
 ;;We use a recursive strategy to get the intersection-set of
 ;;set1 and set2.
@@ -355,23 +355,49 @@
 ;;ex2.59
 ;;union-set
 ;;two empty set; one of the set is empty set; two normal set
-(define (union-set-m set1 set2)
-  (cond ((and (null? set1) (null? set2)) '())
-        ((null? set1) set2)
-        ((null? set2) set1)
-        ((element-not-of-set? (car set1) set2)
-         (cons (car set1) (union-set-m (cdr set1) set2)))
-        (else (union-set-m (cdr set1) set2))))
+;;(define (union-set-m set1 set2)
+;;  (cond ((and (null? set1) (null? set2)) '())
+;;        ((null? set1) set2)
+;;        ((null? set2) set1)
+;;        ((element-not-of-set? (car set1) set2)
+;;         (cons (car set1) (union-set-m (cdr set1) set2)))
+;;        (else (union-set-m (cdr set1) set2))))
 ;;(define (union-set s1 s2)
 ;;  (cond ((and (null? s1) (not (null? s2))) s2)
 ;;        ((and (not (null? s1)) (null? s2)) s1)
 ;;        ((element-of-set? (car s1) s2) (union-set (cdr s1) s2))
 ;;        (else (cons (car s1) (union-set (cdr s1) s2)))))
-(define (union-set s1 s2) (append s1 s2))
+;;(define (union-set s1 s2) (append s1 s2))
 
 ;;ex2.61
+(define (adjoin-set x set)
+  (cond ((null? set) (list x))
+        ((= x (car set)) set)
+        ((< x (car set)) (cons x set))
+        (else (cons (car set) (adjoin-set x (cdr set))))))
 ;;ex2.62
+(define (union-set s1 s2)
+  (cond ((null? s1) s2)
+        ((null? s2) s1)
+        ((= (car s1) (car s2)) (cons (car s1) (union-set (cdr s1) (cdr s2))))
+        ((< (car s1) (car s2)) (cons (car s1) (union-set (cdr s1) (cdr s2))))
+        (else (cons (car s2) (union-set s1 (cdr s2))))))
 
+;;set as binary trees
+(define (entry tree) (car tree))
+(define (left-branch tree) (cadr tree));;(car (cdr tree))
+(define (right-branch tree) (caddr tree));;(car (cdr (cdr tree)))
+(define (make-tree entry left right) (list entry left right))
+(define (element-of-set?-tree x set)
+  (cond ((null? set) false)
+        ((= x (entry set)) true)
+        ((< x (entry set)) (element-of-set?-tree x (left-branch set)))
+        ((> x (entry set)) (element-of-set?-tree x (right-branch set)))))
+(define (adjoin-set-tree x set)
+  (cond ((null? set) (make-tree x '() '()))
+        ((= x (entry set)) set)
+        ((< x (entry set)) (make-tree (entry set) (adjoin-set-tree x (left-branch set)) (right-branch set)))
+        ((> x (entry set)) (make-tree (entry set) (left-branch set) (adjoin-set-tree x (right-branch set))))))
 ;;test
 ;;(memq 'apple '(orange banana prune pear));;false
 ;;(memq 'apple '(x (apple banana) y apple pear));;(apple pear)
@@ -389,6 +415,10 @@
 ;;(element-of-set? 1 odd)
 ;;(intersection-set odd evens)
 (intersection-set odd s1)
+(union-set odd s1)
+;;(element-of-set?-tree 6 odd)
+;;(adjoin-set 3 s1)
+;;(adjoin-set 6 s1)
 ;;(intersection-set odd evens)
 ;;(union-set odd s1)
 ;;(element-not-of-set? 1 evens)
