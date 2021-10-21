@@ -398,6 +398,46 @@
         ((= x (entry set)) set)
         ((< x (entry set)) (make-tree (entry set) (adjoin-set-tree x (left-branch set)) (right-branch set)))
         ((> x (entry set)) (make-tree (entry set) (left-branch set) (adjoin-set-tree x (right-branch set))))))
+
+;;ex2.63
+(define (tree->list-1 tree)
+  (if (null? tree) '()
+      (append (tree->list-1 (left-branch tree))
+              (cons (entry tree)
+                    (tree->list-1 (right-branch tree))))))
+(define (tree-list-2 tree)
+  (define (copy-to-list tree result-list)
+    (if (null? tree) result-list
+        (copy-to-list (left-branch tree)
+                      (cons (entry tree)
+                            (copy-to-list (right-branch tree)
+                                          result-list)))))
+  (copy-to-list tree '()))
+;;ex2.64
+(define (list->tree elements)
+  (car (partial-tree elements (length elements))))
+(define (partial-tree elts n)
+  (if (= n 0)
+      (cons '() elts)
+      (let ((left-size (quotation (- n 1) 2)))
+        (let ((left-result (partial-tree elts left-size)))
+          (let ((left-tree (car left-result))
+                (non-left-elts (cdr left-result))
+                (right-size (- n (+ left-size 1))))
+            (let ((this-entry (car non-left-elts))
+                  (right-result
+                   (partial-tree
+                    (cdr non-left-elts)
+                    right-size)))
+              (let ((right-tree (car right-result))
+                    (remianing-elts (cdr right-result)))
+                (cons (make-tree
+                       this-entry
+                       left-tree
+                       right-tree)
+                      remianing-elts))))))))
+;;ex2.65
+
 ;;test
 ;;(memq 'apple '(orange banana prune pear));;false
 ;;(memq 'apple '(x (apple banana) y apple pear));;(apple pear)
