@@ -419,7 +419,7 @@
 (define (partial-tree elts n)
   (if (= n 0)
       (cons '() elts)
-      (let ((left-size (quotation (- n 1) 2)))
+      (let ((left-size (quotient (- n 1) 2)))
         (let ((left-result (partial-tree elts left-size)))
           (let ((left-tree (car left-result))
                 (non-left-elts (cdr left-result))
@@ -437,6 +437,35 @@
                        right-tree)
                       remianing-elts))))))))
 ;;ex2.65
+
+;;sets and information retrival
+;;(define (lookup given-key set-of-records)
+;;  (cond ((null? set-of-records) false)
+;;        ((equal? given-key (key (car set-of-records)))
+;;         (car set-of-records))
+;;        (else (lookup given-key (cdr set)))))
+
+;;Huffman tree
+(define (append-1 list1 list2)
+  (if (null? list1) list2
+      (cons (car list1) (append-1 (cdr list1) list2))))
+(define (make-leaf symbol weight) (list 'leaf symbol weight))
+(define (leaf? object) (eq? (car object) 'leaf))
+(define (symbol-leaf x) (cadr x))
+(define (weight-leaf x) (caddr x))
+(define (Huffman-left-branch tree) (car tree))
+(define (Huffman-right-branch tree) (cadr tree))
+(define (symbols tree)
+  (if (leaf? tree)
+      (list (symbol-leaf tree))
+      (caddr tree)))
+(define (weight tree)
+  (if (leaf? tree) (weight-leaf tree)
+      (cadddr tree)))
+(define (make-code-tree left right)
+  (list left right (append (symbols left) (symbols right))
+        (+ (weight left) (weight right))))
+
 
 ;;test
 ;;(memq 'apple '(orange banana prune pear));;false
