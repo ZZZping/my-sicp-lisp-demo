@@ -463,8 +463,10 @@
   (if (leaf? tree) (weight-leaf tree)
       (cadddr tree)))
 (define (make-code-tree left right)
-  (list left right (append (symbols left) (symbols right))
-        (+ (weight left) (weight right))))
+  (list left
+   right
+   (append-1 (symbols left) (symbols right))
+   (+ (weight left) (weight right))))
 
 ;;The decoding procedure
 (define (choose-branch bit branch)
@@ -475,7 +477,7 @@
   (define (decode-1 bits current-branch)
     (if (null? bits) '()
         (let ((next-branch (choose-branch (car bits) current-branch)))
-          (if (leaf? next-branch) (cons (symbol-leaf next-branch) (decode-1 (car bits) tree))
+          (if (leaf? next-branch) (cons (symbol-leaf next-branch) (decode-1 (cdr bits) tree))
               (decode-1 (cdr bits) next-branch)))))
   (decode-1 bits tree))
 
@@ -483,6 +485,29 @@
   (cond ((null? set) (list x))
         ((< (weight x) (weight (car set))) (cons x set))
         (else (cons (car set) (adjoin-set-huffman-tree x (cdr set))))))
+(define (make-leaf-set pairs)
+  (if (null? pairs) '()
+      (let ((pair (car pairs)))
+        (adjoin-set-huffman-tree (make-leaf
+                                  (car pair)
+                                  (cadr pair))
+                                 (make-leaf-set (cdr pairs))))))
+
+;;ex2.67
+(define sample-tree
+  (make-code-tree (make-leaf 'A 4)
+                  (make-code-tree (make-leaf 'B 2)
+                                  (make-code-tree (make-leaf 'D 1)
+                                                  (make-leaf 'C 1)))))
+(define sample-message '(0 1 1 0 0 1 0 1 0 1 1 1 0))
+;;(make-leaf-set sample-tree)
+(decode sample-message sample-tree)
+
+;;ex2.68
+;;ex2.69
+;;ex2.70
+;;ex2.71
+;;ex2.72
 
 
 ;;test
