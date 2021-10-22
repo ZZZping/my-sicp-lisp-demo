@@ -466,6 +466,24 @@
   (list left right (append (symbols left) (symbols right))
         (+ (weight left) (weight right))))
 
+;;The decoding procedure
+(define (choose-branch bit branch)
+  (cond ((= bit 0) (Huffman-left-branch branch))
+        ((= bit 1) (Huffman-right-branch branch))
+        (else (error "bad bit: CHOOSE-BRANCH" bit))))
+(define (decode bits tree)
+  (define (decode-1 bits current-branch)
+    (if (null? bits) '()
+        (let ((next-branch (choose-branch (car bits) current-branch)))
+          (if (leaf? next-branch) (cons (symbol-leaf next-branch) (decode-1 (car bits) tree))
+              (decode-1 (cdr bits) next-branch)))))
+  (decode-1 bits tree))
+
+(define (adjoin-set-huffman-tree x set)
+  (cond ((null? set) (list x))
+        ((< (weight x) (weight (car set))) (cons x set))
+        (else (cons (car set) (adjoin-set-huffman-tree x (cdr set))))))
+
 
 ;;test
 ;;(memq 'apple '(orange banana prune pear));;false
