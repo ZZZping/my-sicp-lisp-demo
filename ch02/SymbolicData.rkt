@@ -504,7 +504,28 @@
 (decode sample-message sample-tree)
 
 ;;ex2.68
+(define (encode message tree)
+  (if (null? message) '()
+      (append (encode-symbol (car message) tree)
+              (encode (cdr message) tree))))
+(define (encode-symbol sym tree)
+  (if (leaf? tree)
+      (if (eq? sym (symbol-leaf tree)) '()
+          (error "Missing symbol: ENCODE-SYMBOL" sym))
+      (let ((left (Huffman-left-branch tree)))
+        (if (memq sym (symbols left))
+            (cons 0 (encode-symbol sym left))
+            (cons 1 (encode-symbol sym (Huffman-right-branch tree)))))))
 ;;ex2.69
+(define (generate-huffman-tree pairs)
+  (successive-merge (make-leaf-set pairs)))
+(define (successive-merge leaf-set)
+  (if (= (length leaf-set) 1) (car leaf-set)
+      (let ((first (car leaf-set))
+            (second (cadr leaf-set))
+            (rest (cddr leaf-set)))
+        (successive-merge (adjoin-set (make-code-tree first second)
+                                      rest)))))
 ;;ex2.70
 ;;ex2.71
 ;;ex2.72
@@ -528,6 +549,7 @@
 ;;(intersection-set odd evens)
 (intersection-set odd s1)
 (union-set odd s1)
+(encode '(A D D B C C A D B C A B) sample-tree)
 ;;(element-of-set?-tree 6 odd)
 ;;(adjoin-set 3 s1)
 ;;(adjoin-set 6 s1)
